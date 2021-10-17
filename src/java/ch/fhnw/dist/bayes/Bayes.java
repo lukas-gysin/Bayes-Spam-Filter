@@ -10,23 +10,29 @@ import java.util.zip.ZipFile;
  */
 public class Bayes {
 
-  public static final Filter bayes = new Filter();
+  public static final Filter bayes = new Filter(1);
 
   public static void main(String[] args) {
     readZip("src/resources/ham-anlern.zip", false, Bayes::readMail);
     readZip("src/resources/spam-anlern.zip", true, Bayes::readMail);
-    readZip("src/resources/ham-test.zip", false, Bayes::categorizeMail);
+    readZip("src/resources/ham-kallibrierung.zip", false, Bayes::categorizeMail);
   }
 
   private static void categorizeMail(BufferedReader mail, boolean spam) {
-    double spamProbability = 0.5;
+    double spamProbability;
+    double numerator = 1;
+    double denominator = 1;
     try {
       while (mail.ready()){
         for (String word : mail.readLine().split(" ")) {  // Split the line into words, separated by a whitespace
-          if (!word.isBlank())
-            spamProbability *= bayes.spamProbability(word);
+          if (!word.isBlank()){
+            numerator *= bayes.spamProbability(word);
+            denominator *= bayes.hamProbability(word);
+          }
         }
       }
+      denominator += numerator;
+      spamProbability = numerator / denominator;
       System.out.println("Spam probability: " + spamProbability);
       System.in.read();
     } catch (IOException e) {
@@ -44,7 +50,8 @@ public class Bayes {
     try {
       while (mail.ready()){
         for (String word : mail.readLine().split(" ")) {  // Split the line into words, separated by a whitespace
-          bayes.add(word, spam);
+          if (!word.isBlank())
+            bayes.add(word, spam);
         }
       }
     } catch (IOException e) {

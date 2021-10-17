@@ -8,10 +8,19 @@ import java.util.HashMap;
  * @author Lukas Gysin
  */
 public class Filter {
+  private final int alpha;
   private int nHam = 0;
   private int nSpam = 0;
   private final HashMap<String, Integer> ham = new HashMap<>();
   private final HashMap<String, Integer> spam = new HashMap<>();
+
+  public Filter(){
+    alpha = 1;
+  }
+
+  public Filter(int alpha){
+    this.alpha = alpha;
+  }
 
   /**
    * Adds a word to train the filter
@@ -50,6 +59,16 @@ public class Filter {
   }
 
   /**
+   * Calculates the probability that a mail is ham, given the word appears in it.
+   *
+   * @param word The word witch appears in the mail
+   * @return The probability as a double (0 ≤ spamProbability ≤ 1.0)
+   */
+  public double hamProbability(String word){
+    return hamFrequency(word) / (spamFrequency(word) + hamFrequency(word));
+  }
+
+  /**
    * Calculates the probability that a mail is spam, given the word appears in it.
    *
    * @param word The word witch appears in the mail
@@ -66,7 +85,7 @@ public class Filter {
    * @return The frequency the word appears in ham mails
    */
   private double hamFrequency(String word){
-    return (double)ham.getOrDefault(preprocessWord(word), 1) / nHam;
+    return (double)ham.getOrDefault(preprocessWord(word), alpha) / nHam;
   }
 
   /**
@@ -86,6 +105,6 @@ public class Filter {
    * @return The frequency the word appears in spam mails
    */
   private double spamFrequency(String word){
-    return (double)spam.getOrDefault(preprocessWord(word), 1) / nSpam;
+    return (double)spam.getOrDefault(preprocessWord(word), alpha) / nSpam;
   }
 }
