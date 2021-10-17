@@ -1,19 +1,16 @@
 package ch.fhnw.dist.bayes;
 
 import java.io.*;
-import java.nio.Buffer;
-import java.util.HashMap;
-import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 /**
- * The Bayes-Spam-Filter with the entry point
+ * The entry point of the application
  *
  * @author Lukas Gysin
  */
 public class Bayes {
 
-  private static final HashMap<String, Word> words = new HashMap<>();
+  public static final Filter bayes = new Filter();
 
   public static void main(String[] args) {
     readZip("src/ressources/ham-anlern.zip", false);
@@ -28,9 +25,7 @@ public class Bayes {
   private static void readMail(BufferedReader mail, boolean spam) throws IOException {
       while (mail.ready()){
         for (String word : mail.readLine().split(" ")) {                // Split the line into words, separated by a whitespace
-          Word w = words.getOrDefault(word.strip(), new Word(word.strip()));  // Get the existing word or create a new one
-          w.count(spam);                                                      // Increase the word counter
-          words.put(word.strip(), w);
+          bayes.add(word, spam);
         }
       }
   }
