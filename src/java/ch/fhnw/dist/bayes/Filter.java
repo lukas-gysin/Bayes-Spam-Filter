@@ -32,6 +32,8 @@ public class Filter {
    */
   public void addHam(String word){
     ham.put(word, (ham.containsKey(word) ? ham.get(word) + 1 : 1));
+    String tmpWord = word.strip().toLowerCase(); // Preprocessing of the word
+    ham.put(tmpWord, (ham.containsKey(tmpWord) ? ham.get(tmpWord) + 1 : 1));
   }
 
   /**
@@ -41,5 +43,7 @@ public class Filter {
    */
   public void addSpam(String word){
     spam.put(word, (spam.containsKey(word) ? spam.get(word) + 1 : 1));
+    String tmpWord = word.strip().toLowerCase(); // Preprocessing of the word
+    spam.put(tmpWord, (spam.containsKey(tmpWord) ? spam.get(tmpWord) + 1 : 1));
   }
 }
