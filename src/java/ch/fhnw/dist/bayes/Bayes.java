@@ -13,8 +13,26 @@ public class Bayes {
   public static final Filter bayes = new Filter();
 
   public static void main(String[] args) {
-    readZip("src/ressources/ham-anlern.zip", false);
-    readZip("src/ressources/spam-anlern.zip", true);
+    readZip("src/resources/ham-anlern.zip", false, Bayes::readMail);
+    readZip("src/resources/spam-anlern.zip", true, Bayes::readMail);
+    readZip("src/resources/ham-test.zip", false, Bayes::categorizeMail);
+  }
+
+  private static void categorizeMail(BufferedReader mail, boolean spam) {
+    double spamProbability = 0.5;
+    try {
+      while (mail.ready()){
+        for (String word : mail.readLine().split(" ")) {  // Split the line into words, separated by a whitespace
+          if (!word.isBlank())
+            spamProbability *= bayes.spamProbability(word);
+        }
+      }
+      System.out.println("Spam probability: " + spamProbability);
+      System.in.read();
+    } catch (IOException e) {
+      // An error occurred on the reading process
+      e.printStackTrace();
+    }
   }
 
   /**
@@ -22,31 +40,36 @@ public class Bayes {
    * @param mail A BufferedReader for the mail content
    * @param spam True if the mail contains spam
    */
-  private static void readMail(BufferedReader mail, boolean spam) throws IOException {
+  private static void readMail(BufferedReader mail, boolean spam) {
+    try {
       while (mail.ready()){
-        for (String word : mail.readLine().split(" ")) {                // Split the line into words, separated by a whitespace
+        for (String word : mail.readLine().split(" ")) {  // Split the line into words, separated by a whitespace
           bayes.add(word, spam);
         }
       }
+    } catch (IOException e) {
+      // An error occurred on the reading process
+      e.printStackTrace();
+    }
   }
 
   /**
-   * Reade a `.zip`-file and adds all words to `words`
+   * Reade a `.zip`-file and adds calls the callback
    *
    * @param path The path from the content root to the `.zip`-file
    * @param spam True if the `.zip`-file contains spam mails
+   * @param processor The callback what with the mail should happen
    */
-  private static void readZip(String path, boolean spam){
+  private static void readZip(String path, boolean spam, MailProcessor processor){
     try {
       ZipFile zipFile = new ZipFile(path);
       zipFile.stream().forEach(mail -> {  // Read each mail in the `.zip`-file
         try {
           BufferedReader content = new BufferedReader(new InputStreamReader(zipFile.getInputStream(mail)));
-          readMail(content, spam);
+          processor.process(content, spam);
           content.close();
         } catch (IOException e) {
           // Couldn't get the InputStream for the ZipEntity
-          // or an error occurred on the reading process
           e.printStackTrace();
         }
       });
