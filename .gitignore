@@ -4,3 +4,8 @@ out/
 # IntelliJ
 .idea/
 *.iml
+
+# Gradle
+.gradle/
+build
+/gradle/

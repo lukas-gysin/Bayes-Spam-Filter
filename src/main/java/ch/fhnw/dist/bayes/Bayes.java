@@ -13,9 +13,9 @@ public class Bayes {
   public static final Filter bayes = new Filter(1);
 
   public static void main(String[] args) {
-    readZip("src/resources/ham-anlern.zip", false, Bayes::readMail);
-    readZip("src/resources/spam-anlern.zip", true, Bayes::readMail);
-    readZip("src/resources/ham-kallibrierung.zip", false, Bayes::categorizeMail);
+    readZip("src/main/resources/ham-anlern.zip", false, Bayes::readMail);
+    readZip("src/main/resources/spam-anlern.zip", true, Bayes::readMail);
+    readZip("src/main/resources/ham-kallibrierung.zip", false, Bayes::categorizeMail);
   }
 
   private static void categorizeMail(BufferedReader mail, boolean spam) {
