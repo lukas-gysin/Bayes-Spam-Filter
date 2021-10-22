@@ -32,10 +32,10 @@ public class Filter {
    * Adds a word to train the filter
    *
    * @param word The word to be added
-   * @param ham True, if the mail is ham
+   * @param spam True, if the mail is spam
    */
-  public void add(String word, boolean ham){
-    if (ham){
+  public void add(String word, boolean spam){
+    if (!spam){
       addHam(word);
     } else {
       addSpam(word);
