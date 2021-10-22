@@ -62,6 +62,31 @@ public class FilterTest {
     }
 
     @Test
+    public void hamProbability_ham(){
+        assertEquals(((WORD_HAM_HAM/WORDS_HAM)/((WORD_HAM_HAM/WORDS_HAM)+(ALPHA/WORDS_SPAM))),cut.hamProbability("ham"));
+    }
+
+    @Test
+    public void hamProbability_hello(){
+        assertEquals(((WORD_HAM_HELLO/WORDS_HAM)/((WORD_HAM_HELLO/WORDS_HAM)+(ALPHA/WORDS_SPAM))),cut.hamProbability("hello"));
+    }
+
+    @Test
+    public void hamProbability_spam(){
+        assertEquals(((ALPHA/WORDS_HAM)/((ALPHA/WORDS_HAM)+(WORD_SPAM_SPAM/WORDS_SPAM))),cut.hamProbability("spam"));
+    }
+
+    @Test
+    public void hamProbability_unknown(){
+        assertEquals(((ALPHA/WORDS_HAM)/((ALPHA/WORDS_HAM)+(ALPHA/WORDS_SPAM))),cut.hamProbability("test"));
+    }
+
+    @Test
+    public void hamProbability_viagra(){
+        assertEquals(((ALPHA/WORDS_HAM)/((ALPHA/WORDS_HAM)+(WORD_SPAM_VIAGRA/WORDS_SPAM))),cut.hamProbability("viagra"));
+    }
+
+    @Test
     public void spamFrequency_ham(){
         assertEquals(ALPHA/WORDS_SPAM, cut.spamFrequency("ham"));
     }
@@ -84,5 +109,31 @@ public class FilterTest {
     @Test
     public void spamFrequency_viagra(){
         assertEquals(WORD_SPAM_VIAGRA/WORDS_SPAM, cut.spamFrequency("viagra"));
+    }
+
+
+    @Test
+    public void spamProbability_ham(){
+        assertEquals(((ALPHA/WORDS_SPAM)/((WORD_HAM_HAM/WORDS_HAM)+(ALPHA/WORDS_SPAM))),cut.spamProbability("ham"));
+    }
+
+    @Test
+    public void spamProbability_hello(){
+        assertEquals(((ALPHA/WORDS_SPAM)/((WORD_HAM_HELLO/WORDS_HAM)+(ALPHA/WORDS_SPAM))),cut.spamProbability("hello"));
+    }
+
+    @Test
+    public void spamProbability_spam(){
+        assertEquals(((WORD_SPAM_SPAM/WORDS_SPAM)/((ALPHA/WORDS_HAM)+(WORD_SPAM_SPAM/WORDS_SPAM))),cut.spamProbability("spam"));
+    }
+
+    @Test
+    public void spamProbability_unknown(){
+        assertEquals(((ALPHA/WORDS_SPAM)/((ALPHA/WORDS_HAM)+(ALPHA/WORDS_SPAM))),cut.spamProbability("test"));
+    }
+
+    @Test
+    public void spamProbability_viagra(){
+        assertEquals(((WORD_SPAM_VIAGRA/WORDS_SPAM)/((ALPHA/WORDS_HAM)+(WORD_SPAM_VIAGRA/WORDS_SPAM))),cut.spamProbability("viagra"));
     }
 }
