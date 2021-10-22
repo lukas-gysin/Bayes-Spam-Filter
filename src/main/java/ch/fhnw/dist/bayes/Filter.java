@@ -89,17 +89,28 @@ public class Filter {
     readZip(spam, true, this::readMail);
   }
 
-  // Private Methods
+  // Package-private Methods
   /**
    * Calculates the frequency on witch rate the word appears in ham mails
    *
    * @param word The word
    * @return The frequency the word appears in ham mails
    */
-  private double hamFrequency(String word){
+  double hamFrequency(String word){
     return (double)ham.getOrDefault(preprocessWord(word), alpha) / nHam;
   }
 
+  /**
+   * Calculates the frequency on witch rate the word appears in spam mails
+   *
+   * @param word The word
+   * @return The frequency the word appears in spam mails
+   */
+  double spamFrequency(String word){
+    return (double)spam.getOrDefault(preprocessWord(word), alpha) / nSpam;
+  }
+
+  // Private Methods
   /**
    * Reade a mail and adds all words to `words`
    * @param mail A BufferedReader for the mail content
@@ -154,15 +165,5 @@ public class Filter {
    */
   private String preprocessWord(String word){
     return word.strip().toLowerCase();
-  }
-
-  /**
-   * Calculates the frequency on witch rate the word appears in spam mails
-   *
-   * @param word The word
-   * @return The frequency the word appears in spam mails
-   */
-  private double spamFrequency(String word){
-    return (double)spam.getOrDefault(preprocessWord(word), alpha) / nSpam;
   }
 }
