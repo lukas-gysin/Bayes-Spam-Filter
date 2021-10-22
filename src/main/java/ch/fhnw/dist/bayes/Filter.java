@@ -14,6 +14,7 @@ public class Filter {
   private final HashMap<String, Integer> ham = new HashMap<>();
   private final HashMap<String, Integer> spam = new HashMap<>();
 
+  // Constructors
   public Filter(){
     alpha = 1;
   }
@@ -22,6 +23,7 @@ public class Filter {
     this.alpha = alpha;
   }
 
+  // Public Methods
   /**
    * Adds a word to train the filter
    *
@@ -78,6 +80,7 @@ public class Filter {
     return spamFrequency(word) / (spamFrequency(word) + hamFrequency(word));
   }
 
+  // Private Methods
   /**
    * Calculates the frequency on witch rate the word appears in ham mails
    *
