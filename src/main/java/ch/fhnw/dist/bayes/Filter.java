@@ -1,6 +1,10 @@
 package ch.fhnw.dist.bayes;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.zip.ZipFile;
 
 /**
  * The Bayes-Spam-Filter
@@ -80,6 +84,11 @@ public class Filter {
     return spamFrequency(word) / (spamFrequency(word) + hamFrequency(word));
   }
 
+  public void train(String ham, String spam){
+    readZip(ham, false, this::readMail);
+    readZip(spam, true, this::readMail);
+  }
+
   // Private Methods
   /**
    * Calculates the frequency on witch rate the word appears in ham mails
@@ -89,6 +98,52 @@ public class Filter {
    */
   private double hamFrequency(String word){
     return (double)ham.getOrDefault(preprocessWord(word), alpha) / nHam;
+  }
+
+  /**
+   * Reade a mail and adds all words to `words`
+   * @param mail A BufferedReader for the mail content
+   * @param spam True if the mail contains spam
+   */
+  private void readMail(BufferedReader mail, boolean spam) {
+    try {
+      while (mail.ready()){
+        for (String word : mail.readLine().split(" ")) {  // Split the line into words, separated by a whitespace
+          if (!word.isBlank())
+            add(word, spam);
+        }
+      }
+    } catch (IOException e) {
+      // An error occurred on the reading process
+      e.printStackTrace();
+    }
+  }
+
+  /**
+   * Reade a `.zip`-file and adds calls the callback
+   *
+   * @param path The path from the content root to the `.zip`-file
+   * @param spam True if the `.zip`-file contains spam mails
+   * @param processor The callback what with the mail should happen
+   */
+  private void readZip(String path, boolean spam, MailProcessor processor){
+    try {
+      ZipFile zipFile = new ZipFile(path);
+      zipFile.stream().forEach(mail -> {  // Read each mail in the `.zip`-file
+        try {
+          BufferedReader content = new BufferedReader(new InputStreamReader(zipFile.getInputStream(mail)));
+          processor.process(content, spam);
+          content.close();
+        } catch (IOException e) {
+          // Couldn't get the InputStream for the ZipEntity
+          e.printStackTrace();
+        }
+      });
+      zipFile.close();
+    } catch (IOException e) {
+      // Couldn't find the `.zip`-file
+      e.printStackTrace();
+    }
   }
 
   /**
