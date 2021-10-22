@@ -13,10 +13,10 @@ import java.util.zip.ZipFile;
  */
 public class Filter {
 
-  public static final int DEFAULT_ALPHA = 1;
+  public static final double DEFAULT_ALPHA = 1;
   public static final double DEFAULT_THRESHOLD = 0.5;
 
-  private final int alpha;
+  private final double alpha;
   /**
    * The filter has to be sure for this amount or higher, that something is spam, before he categorizes it as spam
    */
@@ -31,14 +31,14 @@ public class Filter {
     this(DEFAULT_ALPHA, DEFAULT_THRESHOLD);
   }
 
-  public Filter(int alpha){
+  public Filter(double alpha){
     this(alpha, DEFAULT_THRESHOLD);
   }
 
-  public Filter(int alpha, double threshold){
-    // Alpha shouldn't be less than 1
-    if (alpha < 1){
-      this.alpha = 1;
+  public Filter(double alpha, double threshold){
+    // Alpha shouldn't be less than 0
+    if (alpha <= 0){
+      this.alpha = Double.MIN_VALUE;
     } else {
       this.alpha = alpha;
     }
@@ -101,6 +101,20 @@ public class Filter {
    */
   public void calibrate(String ham, String spam){
     // TODO: Adjust alpha
+//    readZip(ham, false, (mail, flag) -> {
+//      try {
+//        while (mail.ready()) {
+//          for(String word : mail.readLine().split(" ")){
+//            if (!preprocessWord(word).isBlank() && hamProbability(preprocessWord(word)) < 0.5){
+//              System.out.println("Word was false categorized (" + hamProbability(preprocessWord(word)) + ",\t" + ham.contains(preprocessWord(word)) + ",\t" + spam.contains(preprocessWord(word)) + "): '" + word + "'");
+//            }
+//          }
+//        }
+//        System.in.read();
+//      } catch (IOException e) {
+//        e.printStackTrace();
+//      }
+//    });
   }
 
   /**
@@ -162,7 +176,11 @@ public class Filter {
    * @return The frequency the word appears in ham mails
    */
   double hamFrequency(String word){
-    return (double)ham.getOrDefault(preprocessWord(word), alpha) / nHam;
+    if (!ham.containsKey(preprocessWord(word))){
+      return alpha / nHam;
+    } else {
+      return (double)ham.get(preprocessWord(word)) / nHam;
+    }
   }
 
   /**
@@ -172,7 +190,11 @@ public class Filter {
    * @return The frequency the word appears in spam mails
    */
   double spamFrequency(String word){
-    return (double)spam.getOrDefault(preprocessWord(word), alpha) / nSpam;
+    if (!spam.containsKey(preprocessWord(word))){
+      return alpha / nSpam;
+    } else {
+      return (double)spam.get(preprocessWord(word)) / nSpam;
+    }
   }
 
   // Private Methods
@@ -233,7 +255,7 @@ public class Filter {
   }
 
   // Getter and Setter
-  public int getAlpha() {
+  public double getAlpha() {
     return alpha;
   }
 
