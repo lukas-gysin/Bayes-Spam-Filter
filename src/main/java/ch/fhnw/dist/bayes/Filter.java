@@ -12,7 +12,15 @@ import java.util.zip.ZipFile;
  * @author Lukas Gysin
  */
 public class Filter {
+
+  public static final int DEFAULT_ALPHA = 1;
+  public static final double DEFAULT_THRESHOLD = 0.5;
+
   private final int alpha;
+  /**
+   * The filter has to be sure for this amount or higher, that something is spam, before he categorizes it as spam
+   */
+  private final double threshold;
   private int nHam = 0;
   private int nSpam = 0;
   private final HashMap<String, Integer> ham = new HashMap<>();
@@ -20,11 +28,29 @@ public class Filter {
 
   // Constructors
   public Filter(){
-    alpha = 1;
+    this(DEFAULT_ALPHA, DEFAULT_THRESHOLD);
   }
 
   public Filter(int alpha){
-    this.alpha = alpha;
+    this(alpha, DEFAULT_THRESHOLD);
+  }
+
+  public Filter(int alpha, double threshold){
+    // Alpha shouldn't be less than 1
+    if (alpha < 1){
+      this.alpha = 1;
+    } else {
+      this.alpha = alpha;
+    }
+
+    // Threshold has to be between 1 and 0, since it represents %
+    if (threshold > 1){
+      this.threshold = 1;
+    } else if (threshold < 0) {
+      this.threshold = 0;
+    } else {
+      this.threshold = threshold;
+    }
   }
 
   // Public Methods
@@ -75,6 +101,27 @@ public class Filter {
    */
   public void calibrate(String ham, String spam){
     // TODO: Adjust alpha
+  }
+
+  /**
+   * Categorizes if a mail is spam or not
+   * @param mail The content of the mail
+   * @return True, if the mail is spam
+   * @throws IOException Throws a IOException, if an error occurs while reading the mail
+   */
+  public boolean categorize(BufferedReader mail) throws IOException {
+    double numerator = 1;
+    double denominator = 1;
+    while (mail.ready()){
+      for (String word : mail.readLine().split(" ")) {  // Split the line into words, separated by a whitespace
+        if (!preprocessWord(word).isBlank()){ // Skip blank words
+          numerator *= spamProbability(word);
+          denominator *= hamProbability(word);
+        }
+      }
+    }
+    denominator += numerator;
+    return (numerator / denominator) >= threshold; // The spam probability
   }
 
   /**
@@ -183,5 +230,14 @@ public class Filter {
    */
   private String preprocessWord(String word){
     return word.strip().toLowerCase();
+  }
+
+  // Getter and Setter
+  public int getAlpha() {
+    return alpha;
+  }
+
+  public double getThreshold() {
+    return threshold;
   }
 }
