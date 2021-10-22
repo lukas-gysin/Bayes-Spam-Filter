@@ -49,8 +49,10 @@ public class Filter {
    */
   public void addHam(String word){
     String tmpWord = preprocessWord(word); // Preprocessing of the word
-    ham.put(tmpWord, (ham.containsKey(tmpWord) ? ham.get(tmpWord) + 1 : 1));
-    nHam++;
+    if (!tmpWord.isBlank()) {
+      ham.put(tmpWord, (ham.containsKey(tmpWord) ? ham.get(tmpWord) + 1 : 1));
+      nHam++;
+    }
   }
 
   /**
@@ -60,8 +62,19 @@ public class Filter {
    */
   public void addSpam(String word){
     String tmpWord = preprocessWord(word); // Preprocessing of the word
-    spam.put(tmpWord, (spam.containsKey(tmpWord) ? spam.get(tmpWord) + 1 : 1));
-    nSpam++;
+    if (!tmpWord.isBlank()) {
+      spam.put(tmpWord, (spam.containsKey(tmpWord) ? spam.get(tmpWord) + 1 : 1));
+      nSpam++;
+    }
+  }
+
+  /**
+   * Calibrates the filter by adjusting alpha to a good level
+   * @param ham The path to a `.zip`-file with ham-mails for calibration in it.
+   * @param spam The path to a `.zip`-file with spam-mails for calibration in it.
+   */
+  public void calibrate(String ham, String spam){
+    // TODO: Adjust alpha
   }
 
   /**
@@ -84,6 +97,11 @@ public class Filter {
     return spamFrequency(word) / (spamFrequency(word) + hamFrequency(word));
   }
 
+  /**
+   * Trains the filter
+   * @param ham The path to a `.zip`-file with ham-mails for training in it.
+   * @param spam The path to a `.zip`-file with spam-mails for training in it.
+   */
   public void train(String ham, String spam){
     readZip(ham, false, this::readMail);
     readZip(spam, true, this::readMail);

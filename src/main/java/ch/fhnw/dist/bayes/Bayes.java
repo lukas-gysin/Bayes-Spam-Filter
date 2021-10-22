@@ -14,7 +14,7 @@ public class Bayes {
 
   public static void main(String[] args) {
     bayes.train("src/main/resources/ham-anlern.zip", "src/main/resources/spam-anlern.zip");
-//    readZip("src/main/resources/ham-kallibrierung.zip", false, Bayes::categorizeMail);
+    bayes.calibrate("src/main/resources/ham-kallibrierung.zip", "src/main/resources/spam-kallibrierung.zip");
   }
 
   private static void categorizeMail(BufferedReader mail, boolean spam) {
@@ -39,5 +39,4 @@ public class Bayes {
       e.printStackTrace();
     }
   }
-
 }
